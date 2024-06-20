@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Department = require('../models/department');
 const bcrypt = require('bcrypt');
+
 exports.createUser = async (req, res) => {
     const { name, email, password, phoneNumber, id, department, role } = req.body;
 
@@ -11,8 +12,18 @@ exports.createUser = async (req, res) => {
             if (!foundDepartment) {
                 return res.status(400).json({ error: 'Department not found' });
             }
+
+            // Check if a department dean already exists for the department
+            if (role === 'department_dean') {
+                const existingDean = await User.findOne({ department, role: 'department_dean' });
+                if (existingDean) {
+                    return res.status(400).json({ error: 'A department dean already exists for this department' });
+                }
+            }
         }
+
         const hashedPassword = await bcrypt.hash(password, 10);
+
         // Create new user
         const newUser = new User({
             name,

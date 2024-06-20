@@ -4,6 +4,6 @@ const userController = require('../controllers/hrController');
 const authenticateSuperAdmin = require('../middlewares/superAdminAuth');
 
 // Route to create an HR user
-router.post('/create-hr', authenticateSuperAdmin, userController.createHRUser);
+router.post('/create-hr', userController.createHRUser);
 
 module.exports = router;
