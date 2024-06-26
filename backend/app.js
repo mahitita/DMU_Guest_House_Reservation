@@ -8,6 +8,8 @@ const hrRoutes = require('./routes/hrRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const authenticateSuperAdmin = require('./middlewares/superAdminAuth');
 const authRoutes = require('./routes/auth');
+const requestRoutes = require('./routes/requestRoutes');
+
 
 require('dotenv').config();
 const app = express();
@@ -43,6 +45,9 @@ app.use('/users', userRoutes);
 app.use('/departments', departmentRoutes);
 app.use('/hrusers', hrRoutes);
 app.use('/api/auth', authRoutes);
+
+
+app.use('/api/requests', requestRoutes);
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

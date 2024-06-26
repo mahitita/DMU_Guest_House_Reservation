@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-exports.createRequest = async (req, res) => {
+const createRequest = async (req, res) => {
     const { staff, department, type, details } = req.body;
 
     try {
@@ -52,3 +52,7 @@ exports.createRequest = async (req, res) => {
     }
 };
 
+module.exports = {
+    createRequest,
+    upload
+};
