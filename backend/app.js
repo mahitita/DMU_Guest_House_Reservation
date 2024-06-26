@@ -1,5 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bodyParser = require('body-parser');
+const Grid = require('gridfs-stream');
+const multer = require('multer');
+const { GridFsStorage } = require('multer-gridfs-storage');
 require("dotenv").config();
 
 const ticketRoutes = require("./routes/ticketRoutes");
@@ -8,41 +12,71 @@ const hrRoutes = require('./routes/hrRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const authenticateSuperAdmin = require('./middlewares/superAdminAuth');
 const authRoutes = require('./routes/auth');
+const requestRoutes = require('./routes/requestRoutes');
 
-require('dotenv').config();
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // MongoDB Atlas connection
 const uri = process.env.MONGODB_URI;
-mongoose
-  .connect(uri)
-  .then(() => {
-    console.log("Connected to MongoDB Atlas");
-  })
-  .catch((error) => {
-    console.error("Error connecting to MongoDB Atlas:", error);
-  });
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log("Connected to MongoDB Atlas");
+})
+.catch((error) => {
+  console.error("Error connecting to MongoDB Atlas:", error);
+});
+
+// Initialize GridFS stream
+let gfs;
+
+mongoose.connection.once('open', () => {
+  gfs = Grid(mongoose.connection.db, mongoose.mongo);
+  gfs.collection('uploads');
+});
+
+// Create storage engine
+const storage = new GridFsStorage({
+  url: uri,
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      const filename = Date.now() + '-' + file.originalname;
+      const fileInfo = {
+        filename: filename,
+        bucketName: 'uploads'
+      };
+      resolve(fileInfo);
+    });
+  }
+});
+
+const upload = multer({ storage });
 
 // Routes that require super admin authentication
 app.post('/superadmin', authenticateSuperAdmin, (req, res) => {
   res.json({ message: 'Super admin authenticated successfully', user: req.user });
 });
 
-// Routes
+// Basic route
 app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
-// Use ticket routes
+// Use routes
 app.use("/tickets", ticketRoutes);
 app.use('/users', userRoutes);
 app.use('/departments', departmentRoutes);
 app.use('/hrusers', hrRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/requests', requestRoutes(upload));
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

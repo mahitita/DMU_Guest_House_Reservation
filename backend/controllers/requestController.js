@@ -1,18 +1,5 @@
 const Request = require('../models/request');
 const Department = require('../models/department');
-const multer = require('multer');
-
-// Configure multer for file upload
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // Directory to store uploaded files
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname); // Unique filename
-    }
-});
-
-const upload = multer({ storage: storage });
 
 exports.createRequest = async (req, res) => {
     const { staff, department, type, details } = req.body;
@@ -51,4 +38,3 @@ exports.createRequest = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
-
