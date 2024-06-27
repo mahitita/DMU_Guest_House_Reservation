@@ -13,7 +13,7 @@ const departmentRoutes = require('./routes/departmentRoutes');
 const authenticateSuperAdmin = require('./middlewares/superAdminAuth');
 const authRoutes = require('./routes/auth');
 const requestRoutes = require('./routes/requestRoutes');
-
+const roomRoutes = require('./routes/roomRoutes');
 const app = express();
 
 // Middleware
@@ -71,7 +71,7 @@ app.use('/departments', departmentRoutes);
 app.use('/hrusers', hrRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/requests', requestRoutes); // No need to pass upload here
-
+app.use('/rooms', roomRoutes);
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
