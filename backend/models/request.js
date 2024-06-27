@@ -15,7 +15,7 @@ const RequestSchema = new mongoose.Schema({
         required: true
     },
     details: { type: String },
-    document: { type: String }, // Assuming the document is stored as a URL or file path
+    document: { type: String }, // Store document URL or path here
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
     status: {
