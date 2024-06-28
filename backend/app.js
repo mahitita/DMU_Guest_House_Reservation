@@ -8,8 +8,8 @@ const hrRoutes = require('./routes/hrRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const authenticateSuperAdmin = require('./middlewares/superAdminAuth');
 const authRoutes = require('./routes/auth');
+const roomRoutes = require('./routes/roomRoutes'); // Ensure this line points to the correct file
 
-require('dotenv').config();
 const app = express();
 
 // Middleware
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 // MongoDB Atlas connection
 const uri = process.env.MONGODB_URI;
 mongoose
-  .connect(uri)
+  .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("Connected to MongoDB Atlas");
   })
@@ -37,12 +37,13 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
-// Use ticket routes
 app.use("/tickets", ticketRoutes);
 app.use('/users', userRoutes);
 app.use('/departments', departmentRoutes);
 app.use('/hrusers', hrRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/rooms', roomRoutes); // This should match the URL you are trying to access
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

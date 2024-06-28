@@ -9,7 +9,7 @@ exports.createHRUser = async (req, res) => {
     try {
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
-        if (existingUser) {
+        if (eaxistingUser) {
             return res.status(400).json({ error: 'User already exists' });
         }
 
