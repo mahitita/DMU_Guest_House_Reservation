@@ -28,6 +28,7 @@ const LoginForm = () => {
         <button type="submit" className="btn">Login</button>
         <div className="register-link">
           <p>Don't have an account? <Link to="/Register">Register</Link></p>
+          <Link to="/Register" className="btn nav__btn">Sign</Link>
         </div>
       </form>
     </div>

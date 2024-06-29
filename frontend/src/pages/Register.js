@@ -7,7 +7,7 @@ const RegisterForm = () => {
     <div className="body2">
       <div className="wrapper">
         <form action="">
-          <h1>Register</h1>
+          <h1>Create User</h1>
           <div className="input-box">
             <input type="text" placeholder="Username" required />
             <i className='bx bxs-user'></i>
