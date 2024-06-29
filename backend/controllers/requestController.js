@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Request = require('../models/request');
 const User = require('../models/user');
 const Department = require('../models/department');
+const Ticket = require('../models/ticket'); // Include the Ticket model
+const { v4: uuidv4 } = require('uuid'); // For generating unique ticket IDs
 
 // Controller function to create a new request with file upload
 exports.createRequest = async (req, res) => {
@@ -172,7 +174,7 @@ exports.approveRequestByDean = async (req, res) => {
     } catch (err) {
         // Handle any errors
         console.error('Error approving request:', err);
-        res.status(500).json({ error: 'Server error' });
+        res.status500.json({ error: 'Server error' });
     }
 };
 
@@ -194,7 +196,7 @@ exports.getRequestsForGeneralService = async (req, res) => {
     }
 };
 
-// Controller function for the general service to approve a request
+// Controller function for the general service to approve a request and generate a ticket
 exports.approveRequestByGeneralService = async (req, res) => {
     try {
         const requestId = req.params.id;
@@ -215,6 +217,18 @@ exports.approveRequestByGeneralService = async (req, res) => {
         request.generalServiceApproved = generalServiceApproved || 'approved';
         if (generalServiceApproved === 'approved') {
             request.status = 'approved';
+
+            // Generate a ticket
+            const newTicket = new Ticket({
+                ticket_id: uuidv4(),
+                staff: request.staff.id,
+                expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Ticket expires in 7 days
+                status: 'Approved',
+                purpose: request.type
+            });
+
+            // Save the ticket to the database
+            await newTicket.save();
         } else if (generalServiceApproved === 'rejected') {
             request.status = 'rejected';
         }
@@ -227,6 +241,23 @@ exports.approveRequestByGeneralService = async (req, res) => {
     } catch (err) {
         // Handle any errors
         console.error('Error approving request:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+// Controller function to get all tickets for a specific staff member
+exports.getTicketsByStaff = async (req, res) => {
+    try {
+        const staffId = req.user.id; // Assuming user is authenticated and user data is in req.user
+
+        // Find all tickets for the staff member
+        const tickets = await Ticket.find({ staff: staffId });
+
+        // Respond with the tickets
+        res.status(200).json({ tickets });
+    } catch (err) {
+        // Handle any errors
+        console.error('Error fetching tickets:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };

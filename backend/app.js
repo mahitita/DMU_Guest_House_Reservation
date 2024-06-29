@@ -14,6 +14,9 @@ const authenticateSuperAdmin = require('./middlewares/superAdminAuth');
 const authRoutes = require('./routes/auth');
 const requestRoutes = require('./routes/requestRoutes');
 const roomRoutes = require('./routes/roomRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
+const saunaRoutes = require('./routes/saunaRoutes');
+const cors = require('cors');
 const app = express();
 
 // Middleware
@@ -54,6 +57,14 @@ const storage = new GridFsStorage({
 
 const upload = multer({ storage });
 
+// Configure CORS to allow specific origin and credentials
+const corsOptions = {
+  origin: 'http://localhost:5173',  // Replace with your frontend's URL
+  credentials: true,  // Allow credentials like cookies to be passed along
+};
+
+app.use(cors(corsOptions));
+
 // Routes that require super admin authentication
 app.post('/superadmin', authenticateSuperAdmin, (req, res) => {
   res.json({ message: 'Super admin authenticated successfully', user: req.user });
@@ -72,6 +83,9 @@ app.use('/hrusers', hrRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/requests', requestRoutes); // No need to pass upload here
 app.use('/rooms', roomRoutes);
+app.use('/reserve', reservationRoutes);
+app.use('/api/saunas', saunaRoutes);
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
