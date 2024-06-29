@@ -5,8 +5,8 @@ const RequestSchema = new mongoose.Schema({
         id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         name: { type: String, required: true }
     },
-    departmentDean: {
-        id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    department: {
+        id: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
         name: { type: String, required: true }
     },
     type: {
@@ -15,10 +15,20 @@ const RequestSchema = new mongoose.Schema({
         required: true
     },
     details: { type: String },
-    document: { type: String }, // Assuming the document is stored as a URL or file path
+    document: { type: String }, // Store document URL or path here
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
     status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
+    },
+    deanApproved: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
+    },
+    generalServiceApproved: {
         type: String,
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending'
