@@ -1,0 +1,57 @@
+/* CreateRequestForm.css */
+
+/* Import necessary CSS files first */
+/* @import 'react-date-range/dist/styles.css';
+@import "~react-image-gallery/styles/scss/image-gallery.scss";
+@import 'react-date-range/dist/theme/default.css';
+@import './styles/constants';
+@import './styles/utility';
+@import './components/global-navbar/global-navbar.scss';
+@import './components/ux/input/input.scss';
+@import './components/ux/data-range-picker/date-range-picker.scss'; */
+
+/* Your custom styles */
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+div {
+    margin-bottom: 15px;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+p {
+    margin-top: 20px;
+    font-weight: bold;
+}

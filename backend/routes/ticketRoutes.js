@@ -1,27 +1,12 @@
-const express = require("express");
-const Ticket = require("../models/ticket");
-const mongoose = require('mongoose');
-
+const express = require('express');
 const router = express.Router();
+const ticketController = require('../controllers/ticketController');
+const verifyToken = require('../middlewares/authMiddleware');
 
-// Route to create a ticket
-router.post("/", async (req, res) => {
-    const { staff_id, expiry_date, purpose } = req.body;
+// Get all tickets for a specific staff member
+router.get('/tickets', verifyToken, ticketController.getTicketsByStaff);
 
-    const ticket = new Ticket({
-        ticket_id: new mongoose.Types.ObjectId().toString(), // Generate a unique ID for ticket_id
-        staff_id,
-        expiry_date,
-        purpose
-    });
+// Update ticket status (e.g., mark as used)
+router.put('/tickets/:id', verifyToken, ticketController.updateTicketStatus);
 
-    try {
-        const savedTicket = await ticket.save();
-        res.status(201).json(savedTicket);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
-
-// Export the router
 module.exports = router;
