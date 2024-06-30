@@ -2,22 +2,11 @@ const mongoose = require('mongoose');
 const Request = require('../models/request');
 const User = require('../models/user');
 const Department = require('../models/department');
-const Ticket = require('../models/ticket'); // Include the Ticket model
-const { v4: uuidv4 } = require('uuid'); // For generating unique ticket IDs
 
-// Controller function to create a new request with file upload
+// Create a new request
 exports.createRequest = async (req, res) => {
     try {
-        // Extract data from the json field in the form-data
-        const { staffId, staffName, departmentId, departmentName, type, details } = JSON.parse(req.body.json);
-
-        // Check if a file was uploaded
-        if (!req.file) {
-            return res.status(400).json({ error: 'Please upload a document' });
-        }
-
-        // File URL or path
-        const document = req.file.filename; // Assuming 'filename' is where multer stores uploaded files
+        const { staffId, staffName, departmentId, departmentName, type, details } = req.body;
 
         // Find the staff by custom ID
         const staff = await User.findOne({ id: staffId });
@@ -42,8 +31,7 @@ exports.createRequest = async (req, res) => {
                 name: departmentName
             },
             type,
-            details,
-            document
+            details
         });
 
         // Save the request to the database
@@ -52,214 +40,158 @@ exports.createRequest = async (req, res) => {
         // Respond with success message
         res.status(201).json({ message: 'Request created successfully', request: newRequest });
     } catch (err) {
-        // Handle any errors
         console.error('Error creating request:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };
 
-// Controller function to get all requests for a department dean
+// Get all requests for a department dean
 exports.getRequestsForDean = async (req, res) => {
     try {
-        const deanId = req.user.id; // Assuming user is authenticated and user data is in req.user
+        const departmentId = req.user.department; // Assuming the department ID is stored in req.user
 
-        // Find the dean's department
-        const dean = await User.findById(deanId).populate('departmentDetails');
-        if (!dean) {
-            return res.status(404).json({ error: 'Dean not found' });
-        }
-
-        // Find all requests for the dean's department
-        const requests = await Request.find({ 'department.id': dean.departmentDetails._id });
+        // Find all requests for the department
+        const requests = await Request.find({ 'department.id': departmentId });
 
         // Respond with the requests
         res.status(200).json({ requests });
     } catch (err) {
-        // Handle any errors
-        console.error('Error fetching requests:', err);
+        console.error('Error fetching requests for dean:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };
 
-// Controller function to get all requests created by a specific staff member
+// Update request approval
+exports.updateRequestApproval = async (req, res) => {
+    try {
+        const requestId = req.params.id;
+        const updatedRequest = await Request.findByIdAndUpdate(
+            requestId,
+            { isDeanApproved: 'approved' },
+            { new: true }
+        );
+
+        if (!updatedRequest) {
+            return res.status(404).json({ error: 'Request not found' });
+        }
+
+        res.status(200).json({ request: updatedRequest });
+    } catch (err) {
+        console.error('Error updating request approval:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+// Get requests by staff
 exports.getRequestsByStaff = async (req, res) => {
     try {
         const staffId = req.user.id; // Assuming user is authenticated and user data is in req.user
 
-        // Find all requests created by the staff member
+        // Find all requests by the staff member
         const requests = await Request.find({ 'staff.id': staffId });
 
         // Respond with the requests
         res.status(200).json({ requests });
     } catch (err) {
-        // Handle any errors
-        console.error('Error fetching requests:', err);
+        console.error('Error fetching requests by staff:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };
 
-// Controller function to update a specific request
+// Update a specific request
 exports.updateRequest = async (req, res) => {
     try {
-        const requestId = req.params.id;
-        const { type, details } = req.body; // Get updated fields from the request body
+        const { id } = req.params;
+        const updateData = req.body;
 
-        // Find the request by ID
-        const request = await Request.findById(requestId);
-        if (!request) {
+        // Find the request by ID and update it
+        const updatedRequest = await Request.findByIdAndUpdate(id, updateData, { new: true });
+
+        // If the request is not found
+        if (!updatedRequest) {
             return res.status(404).json({ error: 'Request not found' });
         }
 
-        // Update request fields
-        if (type) request.type = type;
-        if (details) request.details = details;
-
-        // Save the updated request
-        await request.save();
-
         // Respond with the updated request
-        res.status(200).json({ message: 'Request updated successfully', request });
+        res.status(200).json({ message: 'Request updated successfully', request: updatedRequest });
     } catch (err) {
-        // Handle any errors
         console.error('Error updating request:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };
 
-// Controller function to delete a specific request
+// Delete a specific request
 exports.deleteRequest = async (req, res) => {
     try {
-        const requestId = req.params.id;
+        const { id } = req.params;
 
         // Find the request by ID and delete it
-        const deletedRequest = await Request.findByIdAndDelete(requestId);
+        const deletedRequest = await Request.findByIdAndDelete(id);
+
+        // If the request is not found
         if (!deletedRequest) {
             return res.status(404).json({ error: 'Request not found' });
         }
 
         // Respond with success message
-        res.status(200).json({ message: 'Request deleted successfully', request: deletedRequest });
+        res.status(200).json({ message: 'Request deleted successfully' });
     } catch (err) {
-        // Handle any errors
         console.error('Error deleting request:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };
 
-// Controller function for the dean to approve a request
+// Approve a request by dean
 exports.approveRequestByDean = async (req, res) => {
     try {
-        const requestId = req.params.id;
-        const { deanApproved } = req.body; // Get the deanApproved status from the request body
+        const { id } = req.params;
 
-        // Find the request by ID
-        const request = await Request.findById(requestId);
-        if (!request) {
+        // Find the request by ID and update its status
+        const updatedRequest = await Request.findByIdAndUpdate(id, { deanApproved: 'approved' }, { new: true });
+
+        // If the request is not found
+        if (!updatedRequest) {
             return res.status(404).json({ error: 'Request not found' });
         }
 
-        // Update the request status to approved or rejected by the dean
-        request.deanApproved = deanApproved || 'approved';
-        if (deanApproved === 'approved') {
-            request.status = 'pending';
-        } else if (deanApproved === 'rejected') {
-            request.status = 'rejected';
-        }
-
-        // Save the updated request
-        await request.save();
-
         // Respond with the updated request
-        res.status(200).json({ message: 'Request status updated successfully', request });
+        res.status(200).json({ message: 'Request approved by dean', request: updatedRequest });
     } catch (err) {
-        // Handle any errors
-        console.error('Error approving request:', err);
-        res.status500.json({ error: 'Server error' });
+        console.error('Error approving request by dean:', err);
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
-// Controller function to get all requests approved by the dean for the general service
+// Get all requests approved by the dean for general service
 exports.getRequestsForGeneralService = async (req, res) => {
     try {
-        // Find all requests that are approved by the dean and not yet approved/rejected by the general service
-        const requests = await Request.find({
-            deanApproved: 'approved',
-            generalServiceApproved: 'pending'
-        });
+        // Find all requests approved by the dean
+        const requests = await Request.find({ deanApproved: 'approved' });
 
         // Respond with the requests
         res.status(200).json({ requests });
     } catch (err) {
-        // Handle any errors
-        console.error('Error fetching requests:', err);
+        console.error('Error fetching requests for general service:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };
 
-// Controller function for the general service to approve a request and generate a ticket
+// Approve a request by general service
 exports.approveRequestByGeneralService = async (req, res) => {
     try {
-        const requestId = req.params.id;
-        const { generalServiceApproved } = req.body; // Get the generalServiceApproved status from the request body
+        const { id } = req.params;
 
-        // Find the request by ID
-        const request = await Request.findById(requestId);
-        if (!request) {
+        // Find the request by ID and update its status
+        const updatedRequest = await Request.findByIdAndUpdate(id, { generalServiceApproved: 'approved' }, { new: true });
+
+        // If the request is not found
+        if (!updatedRequest) {
             return res.status(404).json({ error: 'Request not found' });
         }
 
-        // Check if the request has been approved by the dean
-        if (request.deanApproved !== 'approved') {
-            return res.status(403).json({ error: 'Unauthorized: Only requests approved by the dean can be processed' });
-        }
-
-        // Update the request status to approved or rejected by the general service
-        request.generalServiceApproved = generalServiceApproved || 'approved';
-        if (generalServiceApproved === 'approved') {
-            request.status = 'approved';
-
-            // Generate a ticket
-            const newTicket = new Ticket({
-                ticket_id: uuidv4(),
-                staff: request.staff.id,
-                expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Ticket expires in 7 days
-                status: 'Approved',
-                purpose: request.type
-            });
-
-            // Save the ticket to the database
-            await newTicket.save();
-        } else if (generalServiceApproved === 'rejected') {
-            request.status = 'rejected';
-        }
-
-        // Save the updated request
-        await request.save();
-
         // Respond with the updated request
-        res.status(200).json({ message: 'Request status updated successfully', request });
+        res.status(200).json({ message: 'Request approved by general service', request: updatedRequest });
     } catch (err) {
-        // Handle any errors
-        console.error('Error approving request:', err);
+        console.error('Error approving request by general service:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };
-
-// Controller function to get all tickets for a specific staff member
-exports.getTicketsByStaff = async (req, res) => {
-    try {
-        const staffId = req.user.id; // Assuming user is authenticated and user data is in req.user
-
-        // Find all tickets for the staff member
-        const tickets = await Ticket.find({ staff: staffId });
-
-        // Respond with the tickets
-        res.status(200).json({ tickets });
-    } catch (err) {
-        // Handle any errors
-        console.error('Error fetching tickets:', err);
-        res.status(500).json({ error: 'Server error' });
-    }
-};
-
-module.exports = exports;

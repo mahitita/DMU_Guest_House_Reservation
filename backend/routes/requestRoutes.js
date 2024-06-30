@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const requestController = require('../controllers/requestController');
-const upload = require('../middlewares/multerConfig'); // Adjust path as necessary
 const verifyToken = require('../middlewares/authMiddleware'); // Adjust path as necessary
 
-// POST request to create a new request with file upload
-router.post('/', upload.single('document'), requestController.createRequest);
+// POST request to create a new request
+router.post('/create', requestController.createRequest);
 
 // GET request for department dean to view all requests in their department
 router.get('/dean', verifyToken, requestController.getRequestsForDean);
 
+router.put('/dean/approve/:id', verifyToken, requestController.updateRequestApproval);
 // GET request for staff to view their own requests
 router.get('/staff', verifyToken, requestController.getRequestsByStaff);
 

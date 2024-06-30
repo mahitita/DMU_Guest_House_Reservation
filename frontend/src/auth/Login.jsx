@@ -1,21 +1,17 @@
-import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { networkAdapter } from '../services/NetworkAdapter';
-import { AuthContext } from '../contexts/AuthContext';
 import validations from '../utils/validations';
 import Toast from '../ux/toast/Toast';
 import { LOGIN_MESSAGES } from '../utils/constants';
 
 const Login = () => {
-    const navigate = useNavigate();
-    const context = useContext(AuthContext);
     const [loginData, setLoginData] = useState({
-        identifier: '', // Changed to identifier to match backend
+        identifier: '',
         password: '',
     });
 
     const [errorMessage, setErrorMessage] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
 
     const handleInputChange = (e) => {
         setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -24,32 +20,49 @@ const Login = () => {
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
 
-        if (validations.validate('email', loginData.identifier)) { // Validate identifier
+        if (validations.validate('email', loginData.identifier)) {
             try {
                 const response = await networkAdapter.post('http://localhost:3000/api/auth/login', loginData, {
-                    credentials: 'include' // Ensure credentials are included in the request
+                    credentials: 'include'
                 });
 
-                console.log('Login response:', response); // Log response for debugging
+                console.log('Login response:', response);
 
                 if (response && response.token) {
-                    // Save token and related data to localStorage
+                    // Store entire response data in localStorage (example, adjust as needed)
+                    localStorage.setItem('userData', JSON.stringify(response));
+
+                    // Store token and role separately for easier access
                     localStorage.setItem('token', response.token);
                     localStorage.setItem('role', response.role);
-                    localStorage.setItem('sidebarList', JSON.stringify(response.sidebarList));
 
-                    // Update context if needed (example)
-                    // context.triggerAuthCheck();
-                    // context.setRole(response.role);
-                    // context.setSidebarList(response.idebarList);
-
-                    // Redirect to dashboard
-                    navigate('/dashboard');
+                    // Redirect based on user role
+                    switch (response.role) {
+                        case 'staff':
+                            window.location.href = '/staffDashboard';
+                            break;
+                        case 'department_dean':
+                            window.location.href = '/DeanDashboard';
+                            break;
+                        case 'general service':
+                            window.location.href = '/generalServiceDashboard';
+                            break;
+                        case 'manager':
+                            window.location.href = '/managerDashboard';
+                            break;
+                        case 'customer':
+                            window.location.href = '/customerDashboard';
+                            break;
+                        default:
+                            // Handle unexpected roles or redirect to a default route
+                            window.location.href = '/dashboard';
+                            break;
+                    }
                 } else if (response && response.error) {
                     setErrorMessage(response.error);
                 }
             } catch (error) {
-                console.error('Login error:', error); // Log error for debugging
+                console.error('Login error:', error);
                 setErrorMessage('Failed to login');
             }
         } else {
@@ -59,10 +72,6 @@ const Login = () => {
 
     const dismissError = () => {
         setErrorMessage('');
-    };
-
-    const dismissSuccessMessage = () => {
-        setSuccessMessage('');
     };
 
     return (
@@ -83,7 +92,7 @@ const Login = () => {
                         </div>
                         <div className="mb-6">
                             <input
-                                type="text" // Changed to text to accept both email and phone
+                                type="text"
                                 name="identifier"
                                 placeholder="Email or Phone"
                                 value={loginData.identifier}
@@ -108,13 +117,6 @@ const Login = () => {
                                 type="error"
                                 message={errorMessage}
                                 dismissError={dismissError}
-                            />
-                        )}
-                        {successMessage && (
-                            <Toast
-                                type="success"
-                                message={successMessage}
-                                dismissError={dismissSuccessMessage}
                             />
                         )}
                         <div className="items-center">

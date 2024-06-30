@@ -57,7 +57,6 @@ const storage = new GridFsStorage({
 
 const upload = multer({ storage });
 
-// Configure CORS to allow specific origin and credentials
 const corsOptions = {
   origin: 'http://localhost:5173',  // Replace with your frontend's URL
   credentials: true,  // Allow credentials like cookies to be passed along
@@ -81,10 +80,10 @@ app.use('/users', userRoutes);
 app.use('/departments', departmentRoutes);
 app.use('/hrusers', hrRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/requests', requestRoutes); // No need to pass upload here
 app.use('/rooms', roomRoutes);
 app.use('/reserve', reservationRoutes);
 app.use('/api/saunas', saunaRoutes);
+app.use('/api/requests', requestRoutes); // Example path; adjust as per your routing needs
 
 // Start server
 const PORT = process.env.PORT || 3000;
