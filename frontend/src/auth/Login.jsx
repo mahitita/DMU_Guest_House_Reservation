@@ -4,7 +4,7 @@ import { networkAdapter } from '../services/NetworkAdapter';
 import validations from '../utils/validations';
 import Toast from '../ux/toast/Toast';
 import { LOGIN_MESSAGES } from '../utils/constants';
-
+import '../styles/login.css';
 const Login = () => {
     const [loginData, setLoginData] = useState({
         identifier: '',
@@ -39,19 +39,22 @@ const Login = () => {
                     // Redirect based on user role
                     switch (response.role) {
                         case 'staff':
-                            window.location.href = '/staffDashboard';
+                            window.location.href = '/staffdashboard';
                             break;
                         case 'department_dean':
                             window.location.href = '/DeanDashboard';
                             break;
-                        case 'general service':
-                            window.location.href = '/generalServiceDashboard';
+                        case 'general_service_directorate':
+                            window.location.href = '/generalservice-dashboard';
                             break;
-                        case 'manager':
-                            window.location.href = '/managerDashboard';
+                        case 'guesthouse_manager':
+                            window.location.href = '/manager-dashboard';
                             break;
                         case 'customer':
                             window.location.href = '/customerDashboard';
+                            break;
+                        case 'hr':
+                            window.location.href = '/hr-dashboard';
                             break;
                         default:
                             // Handle unexpected roles or redirect to a default route
@@ -75,93 +78,50 @@ const Login = () => {
     };
 
     return (
-        <>
-            <div className="login__form">
-                <div className="container mx-auto p-4 flex justify-center min-h-[600px] items-center">
-                    <form
-                        onSubmit={handleLoginSubmit}
-                        className="w-full max-w-lg p-4 md:p-10 shadow-md"
-                    >
-                        <div className="text-center mb-10">
-                            <h2 className="text-3xl font-extrabold text-brand">
-                                Welcome Back
-                            </h2>
-                            <p className="text-gray-500">
-                                Log in to continue to your account
-                            </p>
-                        </div>
-                        <div className="mb-6">
-                            <input
-                                type="text"
-                                name="identifier"
-                                placeholder="Email or Phone"
-                                value={loginData.identifier}
-                                onChange={handleInputChange}
-                                autoComplete="username"
-                                className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={loginData.password}
-                                onChange={handleInputChange}
-                                autoComplete="current-password"
-                                className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-                            />
-                        </div>
-                        {errorMessage && (
-                            <Toast
-                                type="error"
-                                message={errorMessage}
-                                dismissError={dismissError}
-                            />
-                        )}
-                        <div className="items-center">
-                            <div>
-                                <button
-                                    type="submit"
-                                    className="bg-brand bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-                                >
-                                    Log In
-                                </button>
-                            </div>
-                            <div className="flex flex-wrap justify-center my-3 w-full">
-                                <Link
-                                    to="/forgot-password"
-                                    className="inline-block align-baseline text-md text-gray-500 hover:text-blue-800 text-right"
-                                >
-                                    Forgot your password?
-                                </Link>
-                            </div>
-                            <div className="relative">
-                                <div className="absolute left-0 right-0 flex justify-center items-center">
-                                    <div className="border-t w-full absolute"></div>
-                                    <span className="bg-white px-3 text-gray-500 z-10">
-                                        New to Stay Booker?
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="flex flex-wrap justify-center my-3 w-full mt-12">
-                                <Link
-                                    to="/register"
-                                    className="inline-block align-baseline font-medium text-md text-brand hover:text-blue-800 text-right"
-                                >
-                                    Create an account
-                                </Link>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+        <div className="body2">
+            <div className="wrapper">
+                <h1>Welcome Back</h1>
+                <form onSubmit={handleLoginSubmit}>
+                    <div className="input-box">
+                        <input
+                            type="text"
+                            name="identifier"
+                            placeholder="Email or Phone"
+                            value={loginData.identifier}
+                            onChange={handleInputChange}
+                            autoComplete="username"
+                            required
+                        />
+                    </div>
+                    <div className="input-box">
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={loginData.password}
+                            onChange={handleInputChange}
+                            autoComplete="current-password"
+                            required
+                        />
+                    </div>
+                    {errorMessage && (
+                        <Toast
+                            type="error"
+                            message={errorMessage}
+                            dismissError={dismissError}
+                        />
+                    )}
+                    <button type="submit" className="btn">Log In</button>
+                    <div className="remember-forgot">
+                        <Link to="/forgot-password">Forgot your password?</Link>
+                    </div>
+                    <div className="register-link">
+                        <p>New to Stay Booker? <Link to="/register">Create an account</Link></p>
+                    </div>
+                </form>
             </div>
-            <div className="bg-slate-50 flex flex-col mx-auto w-full max-w-lg px-4">
-                <small className="text-slate-600">test user details</small>
-                <small className="text-slate-600">Email: user1@example.com</small>
-                <small className="text-slate-600">Password: password1</small>
-            </div>
-        </>
+
+        </div>
     );
 };
 

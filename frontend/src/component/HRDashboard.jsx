@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import DeanRequests from './DeanRequests'; // Import DeanRequests component
+import CreateUser from './CreateUser';
+import UserView from './userview'; // Import UserView component
 
-const DeanDashboard = ({ roleName }) => {
+const HRDashboard = ({ roleName }) => {
     const sidebarList = [
-        "view requests",
-        "view approved requests",
+        "register user",
+        "view users",
+        "update user information",
         "profile",
         "log out"
     ];
 
     const [selectedContent, setSelectedContent] = useState("Welcome");
 
+    // Function to render selected content based on sidebar selection
     const renderContent = () => {
         switch (selectedContent) {
-            case "view requests":
-                return <DeanRequests />; // Render DeanRequests component
-            case "view approved requests":
-                return <div>View Approved Requests Content</div>;
+            case "register user":
+                return <CreateUser />;
+            case "view users":
+                return <UserView />; // Render UserView component for viewing users
+            case "update user information":
+                return <div>Update User Information Content</div>;
             case "profile":
                 return <div>Profile Content</div>;
             case "log out":
@@ -83,4 +88,4 @@ const DeanDashboard = ({ roleName }) => {
     );
 };
 
-export default DeanDashboard;
+export default HRDashboard;

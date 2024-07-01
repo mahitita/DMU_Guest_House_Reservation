@@ -46,6 +46,9 @@ exports.loginUser = async (req, res) => {
             case 'customer':
                 sidebarList = ["book room", "view bookings"];
                 break;
+            case 'hr':
+                sidebarList = ["register user", "view users", "update user information", "profile", "log out"];
+                break;
             default:
                 sidebarList = [];
         }

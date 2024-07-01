@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import DeanRequests from './DeanRequests'; // Import DeanRequests component
+import AddRoom from './AddRoom'; // Adjust the path based on your project structure
+//import RoomView from './RoomView'; // Import RoomView component for viewing rooms
 
-const DeanDashboard = ({ roleName }) => {
+const ManagerDashboard = ({ roleName }) => {
     const sidebarList = [
-        "view requests",
-        "view approved requests",
-        "profile",
-        "log out"
+        "add room",
+        "view rooms",
+        "view reservation"
     ];
 
     const [selectedContent, setSelectedContent] = useState("Welcome");
 
+    // Function to render selected content based on sidebar selection
     const renderContent = () => {
         switch (selectedContent) {
-            case "view requests":
-                return <DeanRequests />; // Render DeanRequests component
-            case "view approved requests":
-                return <div>View Approved Requests Content</div>;
-            case "profile":
-                return <div>Profile Content</div>;
-            case "log out":
-                return <div>Log Out Content</div>;
+            case "add room":
+                return <AddRoom />;
+            case "view rooms":
+                return <div>View Reservation Content</div>;
+            // return <RoomView />; // Render RoomView component for viewing rooms
+            case "view reservation":
+                return <div>View Reservation Content</div>;
             default:
                 return <div>Welcome to {roleName} Dashboard!</div>;
         }
@@ -83,4 +83,4 @@ const DeanDashboard = ({ roleName }) => {
     );
 };
 
-export default DeanDashboard;
+export default ManagerDashboard;

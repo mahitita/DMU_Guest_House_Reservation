@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import DeanRequests from './DeanRequests'; // Import DeanRequests component
+import GeneralServiceRequests from './GeneralServiceRequests '; // Adjust the import path as per your project structure
 
-const DeanDashboard = ({ roleName }) => {
+const GeneralServiceDashboard = ({ roleName }) => {
     const sidebarList = [
         "view requests",
-        "view approved requests",
+        "view tickets",
         "profile",
         "log out"
     ];
 
+    // const { path } = useRouteMatch();
     const [selectedContent, setSelectedContent] = useState("Welcome");
 
     const renderContent = () => {
         switch (selectedContent) {
             case "view requests":
-                return <DeanRequests />; // Render DeanRequests component
-            case "view approved requests":
-                return <div>View Approved Requests Content</div>;
+                return <GeneralServiceRequests />;
+            case "view tickets":
+                return <div>View Tickets Content</div>;
             case "profile":
                 return <div>Profile Content</div>;
             case "log out":
@@ -76,6 +77,7 @@ const DeanDashboard = ({ roleName }) => {
                 {/* Main Content Area */}
                 <div className="bg-white shadow-md rounded-lg p-8">
                     <h2 className="text-2xl font-bold mb-4">{selectedContent}</h2>
+
                     {renderContent()} {/* Render selected content based on state */}
                 </div>
             </div>
@@ -83,4 +85,4 @@ const DeanDashboard = ({ roleName }) => {
     );
 };
 
-export default DeanDashboard;
+export default GeneralServiceDashboard;

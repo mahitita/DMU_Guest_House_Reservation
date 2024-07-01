@@ -16,6 +16,7 @@ const requestRoutes = require('./routes/requestRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const saunaRoutes = require('./routes/saunaRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 const cors = require('cors');
 const app = express();
 
@@ -84,7 +85,7 @@ app.use('/rooms', roomRoutes);
 app.use('/reserve', reservationRoutes);
 app.use('/api/saunas', saunaRoutes);
 app.use('/api/requests', requestRoutes); // Example path; adjust as per your routing needs
-
+app.use('/api/booking', bookingRoutes);
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

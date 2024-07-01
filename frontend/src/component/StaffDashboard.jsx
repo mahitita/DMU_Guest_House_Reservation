@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import CreateRequestForm from './CreateRequestForm'; // Import CreateRequestForm component
+import StaffRequestsTable from './StaffRequestsTable'; // Import StaffRequestsTable component
+import StaffTickets from './StaffTickets'; // Import StaffTickets component
 
 const StaffDashboard = ({ roleName }) => {
     const sidebarList = [
@@ -12,6 +15,30 @@ const StaffDashboard = ({ roleName }) => {
         "log out"
     ];
 
+    const [selectedContent, setSelectedContent] = useState("Welcome");
+
+    // Function to render selected content based on sidebar selection
+    const renderContent = () => {
+        switch (selectedContent) {
+            case "create request":
+                return <CreateRequestForm />;
+            case "view requests":
+                return <StaffRequestsTable />;
+            case "view tickets":
+                return <StaffTickets />; // Render StaffTickets component
+            case "book room":
+                return <div>Book Room Content</div>;
+            case "view reservation":
+                return <div>View Reservation Content</div>;
+            case "profile":
+                return <div>Profile Content</div>;
+            case "log out":
+                return <div>Log Out Content</div>;
+            default:
+                return <div>Welcome to {roleName} Dashboard!</div>;
+        }
+    };
+
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
@@ -23,12 +50,12 @@ const StaffDashboard = ({ roleName }) => {
                     <ul className="space-y-4">
                         {sidebarList.map((item, index) => (
                             <li key={index}>
-                                <Link
-                                    to={`/${item.replace(/\s+/g, '-').toLowerCase()}`}
-                                    className="text-gray-300 hover:bg-gray-700 hover:text-white block py-2 px-3 rounded-md text-sm font-medium"
+                                <button
+                                    onClick={() => setSelectedContent(item)}
+                                    className="text-gray-300 hover:bg-gray-700 hover:text-white block py-2 px-3 rounded-md text-sm font-medium w-full text-left"
                                 >
                                     {item}
-                                </Link>
+                                </button>
                             </li>
                         ))}
                     </ul>
@@ -60,8 +87,8 @@ const StaffDashboard = ({ roleName }) => {
 
                 {/* Main Content Area */}
                 <div className="bg-white shadow-md rounded-lg p-8">
-                    <h2 className="text-2xl font-bold mb-4">Welcome to {roleName} Dashboard!</h2>
-                    <p>This is where you can manage your tasks, view reports, and more.</p>
+                    <h2 className="text-2xl font-bold mb-4">{selectedContent}</h2>
+                    {renderContent()} {/* Render selected content based on state */}
                 </div>
             </div>
         </div>
